@@ -6,79 +6,159 @@
   <title>Pokemon Team Builder</title>
 
   <style>
-  body {
-    background-color: #cfe8f3; /* light blue */
-    font-family: Arial, sans-serif;
-    text-align: center;
-  }
+    body {
+      background-color: #b7dce8;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px 0;
+    }
 
-  h1 {
-    margin-top: 20px;
-  }
+    .card {
+      background: #fff;
+      border: 8px solid #c89b0e;
+      border-radius: 26px;
+      width: 420px;
+      margin: 0 auto;
+      padding: 18px 18px 22px;
+    }
 
-  #pokemonArea {
-    background-color: white;
-    border: 6px solid #d4a017; /* gold border */
-    border-radius: 25px;
-    width: 400px;
-    margin: 30px auto;
-    padding: 20px;
-  }
+    .searchLabel {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 6px 0 6px;
+    }
 
-  #pokemonArea h2 {
-    margin-bottom: 10px;
-  }
+    .searchRow {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
 
-  img {
-    margin: 10px 0;
-  }
+    #query {
+      width: 230px;
+      padding: 6px;
+      font-size: 14px;
+    }
 
-  select {
-    width: 160px;
-    margin: 5px;
-    padding: 4px;
-  }
+    #btnFind {
+      padding: 6px 12px;
+      cursor: pointer;
+    }
 
-  button {
-    padding: 8px 14px;
-    margin-top: 10px;
-    cursor: pointer;
-  }
+    #pokeName {
+      margin: 6px 0 10px;
+      font-size: 22px;
+    }
 
-  #btnAdd {
-    margin-top: 15px;
-  }
+    #pokeImg {
+      width: 230px;
+      height: 230px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 8px;
+    }
 
-  #teamList {
-    width: 400px;
-    margin: 0 auto;
-    text-align: left;
-  }
+    audio {
+      width: 92%;
+      margin: 6px auto 10px;
+      display: block;
+    }
 
-  hr {
-    margin: 30px 0;
-  }
+    #audioMsg {
+      margin: 0 0 10px;
+      font-size: 12px;
+      color: #444;
+    }
+
+    .movesGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 10px;
+      justify-items: center;
+      margin: 10px 0 10px;
+    }
+
+    select {
+      width: 170px;
+      padding: 4px;
+    }
+
+    #btnAdd {
+      padding: 7px 14px;
+      cursor: pointer;
+      margin: 8px 0 14px;
+    }
+
+    .teamTitle {
+      margin: 14px 0 8px;
+      font-size: 20px;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .teamBox {
+      border: 1px solid #aaa;
+      padding: 10px;
+      border-radius: 6px;
+      background: #fff;
+      text-align: left;
+    }
+
+    .teamEntry {
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      padding: 8px;
+      margin: 10px 0;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .teamEntry img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .teamEntry h4 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+
+    .teamEntry ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .muted {
+      color: #555;
+      font-size: 12px;
+    }
   </style>
 </head>
-  
+
 <body>
-  <h1>Pokemon Team Builder</h1>
-
-  <label for="query">Name or ID</label>
-  <input id="query" type="text" placeholder="e.g. 143 or snorlax" />
-  <button id="btnFind">Find</button>
-
-  <hr />
-
-  <div id="pokemonArea">
-    <h2 id="pokeName">---</h2>
-    <img id="pokeImg" alt="Pokemon image" width="250" />
-    <div>
-      <audio id="pokeAudio" controls></audio>
-      <p id="audioMsg"></p>
+  <div class="card">
+    <!-- Search -->
+    <div class="searchLabel">Name or ID</div>
+    <div class="searchRow">
+      <input id="query" type="text" placeholder="e.g. snorlax or 143" />
+      <button id="btnFind">Find</button>
     </div>
 
-    <div>
+    <!-- Pokemon Display -->
+    <h2 id="pokeName">---</h2>
+    <img id="pokeImg" alt="Pokemon image" />
+
+    <audio id="pokeAudio" controls></audio>
+    <p id="audioMsg" class="muted"></p>
+
+    <div class="movesGrid">
       <select id="move1"></select>
       <select id="move2"></select>
       <select id="move3"></select>
@@ -86,12 +166,11 @@
     </div>
 
     <button id="btnAdd">Add to Team</button>
+
+    <!-- Team (inside same box) -->
+    <div class="teamTitle">My Team</div>
+    <div class="teamBox" id="teamList"></div>
   </div>
-
-  <hr />
-
-  <h2>My Team</h2>
-  <ol id="teamList"></ol>
 
   <script src="script.js"></script>
 </body>
