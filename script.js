@@ -1,4 +1,4 @@
-// Cache (memory + localStorage)
+// Cache responses to reduce API calls (memory + localStorage cache)
 const memCache = new Map();
 const CACHE_PREFIX = "pokeCache:";
 
@@ -21,7 +21,7 @@ const moveSelects = [
 const teamListEl = document.getElementById("teamList");
 
 let currentPokemon = null;
-let team = JSON.parse(localStorage.getItem("team")) || [];
+let team = []; // IMPORTANT: always empty on reload (fresh user test)
 
 function cap(str) {
   return str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
@@ -82,6 +82,7 @@ async function fetchPokemon(query) {
 
   const url = `https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(cleaned)}`;
   const res = await fetch(url);
+
   if (!res.ok) throw new Error("Pokemon not found. Try 1–151 or a valid name.");
 
   const data = await res.json();
@@ -107,7 +108,7 @@ function updateUI(poke) {
   const cry = poke?.cries?.latest || poke?.cries?.legacy || "";
   setAudio(cry);
 
-  // Moves
+  // Moves into 4 dropdowns
   const moves = poke.moves.map((m) => m.move.name);
   const safeMoves = moves.length ? moves : ["(no moves found)"];
   moveSelects.forEach((sel) => fillSelect(sel, safeMoves));
@@ -117,7 +118,8 @@ function renderTeam() {
   teamListEl.innerHTML = "";
 
   if (team.length === 0) {
-    teamListEl.innerHTML = `<div class="muted">No Pokémon added yet.</div>`;
+    teamListEl.innerHTML =
+      `<div class="muted" style="text-align:center;">No Pokémon added yet.</div>`;
     return;
   }
 
@@ -141,7 +143,7 @@ function renderTeam() {
   });
 }
 
-// Events
+// Find button
 btnFind.addEventListener("click", async () => {
   try {
     const data = await fetchPokemon(queryEl.value);
@@ -151,17 +153,19 @@ btnFind.addEventListener("click", async () => {
   }
 });
 
+// Enter key triggers Find
 queryEl.addEventListener("keydown", (e) => {
   if (e.key === "Enter") btnFind.click();
 });
 
+// Add to Team button
 btnAdd.addEventListener("click", () => {
   if (!currentPokemon) {
     alert("Find a Pokémon first.");
     return;
   }
 
-  // Optional: limit to 6
+  // optional: limit to 6
   if (team.length >= 6) {
     alert("Team is full (6).");
     return;
@@ -173,12 +177,10 @@ btnAdd.addEventListener("click", () => {
     "";
 
   const chosenMoves = moveSelects.map((sel) => sel.value);
-
   const types = (currentPokemon.types || []).map((t) => cap(t.type.name));
   const abilities = (currentPokemon.abilities || []).map((a) => cap(a.ability.name));
 
   const member = {
-    id: currentPokemon.id, // kept internally if you want it later
     name: cap(currentPokemon.name),
     img: img,
     types: types.length ? types : ["Unknown"],
@@ -187,9 +189,8 @@ btnAdd.addEventListener("click", () => {
   };
 
   team.push(member);
-  localStorage.setItem("team", JSON.stringify(team));
   renderTeam();
 });
 
-// Initial render
+// initial render (empty team)
 renderTeam();
