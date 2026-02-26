@@ -1,4 +1,4 @@
-// Simple caching (memory + localStorage) to reduce API calls
+// Cache (memory + localStorage)
 const memCache = new Map();
 const CACHE_PREFIX = "pokeCache:";
 
@@ -23,9 +23,12 @@ const teamListEl = document.getElementById("teamList");
 let currentPokemon = null;
 let team = JSON.parse(localStorage.getItem("team")) || [];
 
-// ---------- helpers ----------
 function cap(str) {
   return str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+}
+
+function niceName(str) {
+  return (str || "").replaceAll("-", " ");
 }
 
 function fillSelect(select, options) {
@@ -33,21 +36,9 @@ function fillSelect(select, options) {
   for (const opt of options) {
     const o = document.createElement("option");
     o.value = opt;
-    o.textContent = opt;
+    o.textContent = niceName(opt);
     select.appendChild(o);
   }
-}
-
-function renderTeam() {
-  teamListEl.innerHTML = "";
-  team.forEach((member) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>${member.name}</strong> (ID: ${member.id})<br>
-      Moves: ${member.moves.join(", ")}
-    `;
-    teamListEl.appendChild(li);
-  });
 }
 
 function setAudio(url) {
@@ -101,10 +92,10 @@ async function fetchPokemon(query) {
 function updateUI(poke) {
   currentPokemon = poke;
 
-  // Name + ID
-  pokeNameEl.textContent = `${cap(poke.name)} (#${poke.id})`;
+  // Name ONLY (no number)
+  pokeNameEl.textContent = cap(poke.name);
 
-  // Image (official artwork preferred)
+  // Image
   const img =
     poke?.sprites?.other?.["official-artwork"]?.front_default ||
     poke?.sprites?.front_default ||
@@ -112,18 +103,45 @@ function updateUI(poke) {
   pokeImgEl.src = img;
   pokeImgEl.alt = poke.name;
 
-  // Audio (PokeAPI "cries" if available)
+  // Audio (cries)
   const cry = poke?.cries?.latest || poke?.cries?.legacy || "";
   setAudio(cry);
 
-  // Moves -> 4 dropdowns
+  // Moves
   const moves = poke.moves.map((m) => m.move.name);
   const safeMoves = moves.length ? moves : ["(no moves found)"];
-
   moveSelects.forEach((sel) => fillSelect(sel, safeMoves));
 }
 
-// ---------- events ----------
+function renderTeam() {
+  teamListEl.innerHTML = "";
+
+  if (team.length === 0) {
+    teamListEl.innerHTML = `<div class="muted">No Pokémon added yet.</div>`;
+    return;
+  }
+
+  team.forEach((member) => {
+    const entry = document.createElement("div");
+    entry.className = "teamEntry";
+
+    entry.innerHTML = `
+      <img src="${member.img}" alt="${member.name}" />
+      <div>
+        <h4>${member.name}</h4>
+        <ul>
+          <li><strong>Type:</strong> ${member.types.join(", ")}</li>
+          <li><strong>Ability:</strong> ${member.abilities.join(", ")}</li>
+          <li><strong>Moves:</strong> ${member.moves.map(niceName).join(", ")}</li>
+        </ul>
+      </div>
+    `;
+
+    teamListEl.appendChild(entry);
+  });
+}
+
+// Events
 btnFind.addEventListener("click", async () => {
   try {
     const data = await fetchPokemon(queryEl.value);
@@ -133,35 +151,45 @@ btnFind.addEventListener("click", async () => {
   }
 });
 
-// optional: press Enter in input
 queryEl.addEventListener("keydown", (e) => {
   if (e.key === "Enter") btnFind.click();
 });
 
 btnAdd.addEventListener("click", () => {
   if (!currentPokemon) {
-    alert("Find a Pokemon first.");
+    alert("Find a Pokémon first.");
     return;
   }
+
+  // Optional: limit to 6
+  if (team.length >= 6) {
+    alert("Team is full (6).");
+    return;
+  }
+
+  const img =
+    currentPokemon?.sprites?.other?.["official-artwork"]?.front_default ||
+    currentPokemon?.sprites?.front_default ||
+    "";
 
   const chosenMoves = moveSelects.map((sel) => sel.value);
 
+  const types = (currentPokemon.types || []).map((t) => cap(t.type.name));
+  const abilities = (currentPokemon.abilities || []).map((a) => cap(a.ability.name));
+
   const member = {
-    id: currentPokemon.id,
+    id: currentPokemon.id, // kept internally if you want it later
     name: cap(currentPokemon.name),
+    img: img,
+    types: types.length ? types : ["Unknown"],
+    abilities: abilities.length ? abilities : ["Unknown"],
     moves: chosenMoves,
   };
-
-  // optional: limit to 6
-  if (team.length >= 6) {
-    alert("Team is full (6). Remove one in code if you want more.");
-    return;
-  }
 
   team.push(member);
   localStorage.setItem("team", JSON.stringify(team));
   renderTeam();
 });
 
-// initial render
+// Initial render
 renderTeam();
