@@ -27,6 +27,7 @@
       font-size: 20px;
       font-weight: 600;
       margin: 6px 0 6px;
+      text-align: center;
     }
 
     .searchRow {
@@ -40,6 +41,7 @@
       width: 230px;
       padding: 6px;
       font-size: 14px;
+      text-align: left;
     }
 
     #btnFind {
@@ -91,38 +93,43 @@
       margin: 8px 0 14px;
     }
 
+    /* My Team section centered */
     .teamTitle {
       margin: 14px 0 8px;
       font-size: 20px;
       font-weight: 700;
-      text-align: left;
+      text-align: center;
     }
 
     .teamBox {
       border: 1px solid #aaa;
-      padding: 10px;
+      padding: 12px;
       border-radius: 6px;
       background: #fff;
+      width: 92%;
+      margin: 0 auto;
       text-align: left;
     }
 
+    /* Team entry: image left, bullets right */
     .teamEntry {
       border: 1px solid #bbb;
       border-radius: 6px;
-      padding: 8px;
+      padding: 10px;
       margin: 10px 0;
       display: flex;
-      gap: 10px;
+      gap: 12px;
       align-items: flex-start;
     }
 
     .teamEntry img {
-      width: 70px;
-      height: 70px;
+      width: 85px;
+      height: 85px;
       object-fit: contain;
       border: 1px solid #ddd;
       border-radius: 6px;
       background: #fff;
+      flex-shrink: 0;
     }
 
     .teamEntry h4 {
@@ -144,14 +151,12 @@
 
 <body>
   <div class="card">
-    <!-- Search -->
     <div class="searchLabel">Name or ID</div>
     <div class="searchRow">
       <input id="query" type="text" placeholder="e.g. snorlax or 143" />
       <button id="btnFind">Find</button>
     </div>
 
-    <!-- Pokemon Display -->
     <h2 id="pokeName">---</h2>
     <img id="pokeImg" alt="Pokemon image" />
 
@@ -167,7 +172,6 @@
 
     <button id="btnAdd">Add to Team</button>
 
-    <!-- Team (inside same box) -->
     <div class="teamTitle">My Team</div>
     <div class="teamBox" id="teamList"></div>
   </div>
